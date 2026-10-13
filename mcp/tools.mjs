@@ -15,6 +15,16 @@ export function callTool(state,name,args={}) {
   if(name==='list_features'){if(args.q!==undefined && typeof args.q!=='string')throw new DomainError('INVALID_INPUT','Query must be text.');return {revision:state.revision,items:queryFeatures(state.features,{q:args.q || '',sort:'id'})};}
   if(name==='get_feature'){if(typeof args.id!=='string'||!/^FEAT-\d{3}$/.test(args.id))throw new DomainError('INVALID_INPUT','Invalid feature ID.');const f=state.features.find(x=>x.id===args.id);if(!f)throw new DomainError('NOT_FOUND','Feature not found.',404);return {revision:state.revision,feature:f};}
   // LAB02_CONTEXT_START
-  return {todo:'Implement a bounded release context tool.'};
+  if (name==='get_release_context') {
+    if (!['R1','R2'].includes(args.release)) throw new DomainError('INVALID_INPUT','Release must be R1 or R2.');
+    return {
+      contractVersion:CONTRACT_VERSION,
+      revision:state.revision,
+      release:args.release,
+      features:state.features.filter(feature=>feature.release===args.release),
+      source:'local workspace state',
+      advisory:true
+    };
+  }
   // LAB02_CONTEXT_END
 }
