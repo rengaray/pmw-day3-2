@@ -19,8 +19,8 @@ jobs:
     timeout-minutes: 10
     steps:
       # Workshop uses major-version tags. In production pin each action to a full commit SHA and let Dependabot update it.
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
       - run: npm run preflight
@@ -31,8 +31,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
       - name: Domain hot-path budget
@@ -40,7 +40,7 @@ jobs:
           node scripts/perf.mjs --json > perf-report.json || status=$?
           node -e "const r=require('./perf-report.json');for(const x of r.results)console.log((x.pass?'PASS':'FAIL'),x.name,'p95',x.p95Ms,'ms budget',x.budgetMs,'ms')" >> "$GITHUB_STEP_SUMMARY"
           exit ${status:-0}
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: perf-report
@@ -52,10 +52,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
       - name: Guard self-tests
