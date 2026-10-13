@@ -1,0 +1,27 @@
+{
+  "name": "product-release-workbench",
+  "version": "5.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24 <25"
+  },
+  "scripts": {
+    "start": "node src/server.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "baseline": "node --test tests/baseline.test.mjs",
+    "lab:02": "node --test tests/lab02.test.mjs tests/usage.test.mjs",
+    "lab:03": "node --test tests/lab03.test.mjs",
+    "lab:04": "node --test tests/lab04.test.mjs",
+    "lab:05": "node --test tests/lab05.test.mjs tests/observability.test.mjs",
+    "ci:accepted": "node scripts/accepted.mjs",
+    "perf": "node scripts/perf.mjs",
+    "usage-report": "node scripts/usage-report.mjs",
+    "mcp": "node mcp/server.mjs",
+    "preflight": "node scripts/preflight.mjs",
+    "reset-data": "node scripts/reset-data.mjs",
+    "capture": "node scripts/capture.mjs",
+    "guard": "node scripts/guard.mjs",
+    "guard:test": "node --test ci/guard.test.mjs"
+  }
+}

@@ -1,0 +1,3 @@
+Select pm-reviewer. Attach evidence/usage-report.md, evidence/agent-usage.csv, perf-budget.json and the latest CI run summary for the pull request.
+
+Review how this participant spent model capacity and whether performance gates are trustworthy. Identify the work items with the most observed usage (or, where usage was not observed, the most prompts and rework) per accepted change, the tool calls with the largest estimated results, any truncated results that hid needed context, and any budget or accepted-suite change. Recommend at most three changes to agent model choice, prompt scope, tool result size or instructions. Separate measured facts from estimates. Do not edit or execute.

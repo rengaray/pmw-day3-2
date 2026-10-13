@@ -1,0 +1,17 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { riceScore, queryFeatures, previewRelease } from '../src/domain.mjs';
+import { seed, valid, server, request } from './helpers.mjs';
+const preview=input=>previewRelease(structuredClone(seed),input);
+test('P01 RICE score is 108 for FEAT-001',()=>assert.equal(riceScore(seed.features[0]),108));
+test('P02 Confidence fraction 0.8 produces score 64',()=>assert.equal(riceScore(seed.features[1]),64));
+test('P03 Priority sorting is descending with an ID tie break',()=>{const f=structuredClone(seed.features.slice(0,2));f[1]={...f[0],id:'FEAT-002'};assert.deepEqual(queryFeatures(f).map(x=>x.id),['FEAT-001','FEAT-002']);assert.deepEqual(queryFeatures(seed.features).map(x=>x.id),['FEAT-001','FEAT-002','FEAT-006','FEAT-007','FEAT-004','FEAT-008','FEAT-010','FEAT-011','FEAT-005','FEAT-003','FEAT-009','FEAT-012']);});
+test('P04 Search normalizes spaces and capitals without mutation',()=>{const before=JSON.stringify(seed);assert.equal(queryFeatures(seed.features,{q:'  WAFER  '})[0].id,'FEAT-001');assert.equal(JSON.stringify(seed),before);});
+test('P05 R1 good selection fits exactly eight weeks',()=>{const p=preview(valid);assert.equal(p.eligible,true);assert.equal(p.totalEffort,8);assert.deepEqual(p.blockers,[]);});
+test('P06 Missing dependency blocks FEAT-003 alone',()=>assert.ok(preview({release:'R1',capacity:8,featureIds:['FEAT-003']}).blockers.some(x=>x.code==='DEPENDENCY')));
+test('P07 Capacity and not-ready records create distinct blockers',()=>{assert.ok(preview({...valid,capacity:7}).blockers.some(x=>x.code==='CAPACITY'));assert.ok(preview({release:'R1',capacity:8,featureIds:['FEAT-005']}).blockers.some(x=>x.code==='NOT_READY'));});
+test('P08 Wrong release blocks cross-release selection',()=>assert.ok(preview({release:'R1',capacity:8,featureIds:['FEAT-008']}).blockers.some(x=>x.code==='WRONG_RELEASE')));
+test('P09 Selected dependency cycle is rejected',()=>{const s=structuredClone(seed);s.features[0].dependencies=['FEAT-002'];s.features[1].dependencies=['FEAT-001'];assert.ok(previewRelease(s,{release:'R1',capacity:8,featureIds:['FEAT-001','FEAT-002']}).blockers.some(x=>x.code==='CYCLE'));});
+test('P10 Invalid selection and unknown IDs do not masquerade as readiness',()=>{assert.throws(()=>preview({...valid,featureIds:['FEAT-001','FEAT-001']}),{code:'INVALID_INPUT'});assert.throws(()=>preview({...valid,featureIds:['FEAT-999']}),{code:'NOT_FOUND'});});
+test('P11 Fractional weeks use exact hundredths in capacity comparison',()=>{const s=structuredClone(seed);s.features[0].effort=.1;s.features[1].effort=.2;const p=previewRelease(s,{release:'R1',capacity:.3,featureIds:['FEAT-001','FEAT-002']});assert.equal(p.totalEffort,.3);assert.equal(p.eligible,true);});
+test('P12 HTTP consumer returns the same preview contract',async t=>{const {base}=await server(t);const r=await request(base,'/api/preview','POST',valid);assert.equal(r.status,200);assert.equal(r.data.eligible,true);assert.equal(r.data.totalEffort,8);assert.equal(r.data.snapshotHash.length,64);});

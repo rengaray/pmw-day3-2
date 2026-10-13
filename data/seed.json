@@ -1,0 +1,196 @@
+{
+  "revision": 1,
+  "features": [
+    {
+      "id": "FEAT-001",
+      "title": "Wafer map bin overlay",
+      "product": "Yield Analytics",
+      "owner": "Asha",
+      "status": "ready",
+      "release": "R1",
+      "reach": 120,
+      "impact": 3,
+      "confidence": 0.9,
+      "effort": 3,
+      "dependencies": [
+        "FEAT-006"
+      ],
+      "version": 1,
+      "notes": "Overlay final-test bin results on wafer maps so yield engineers can spot edge and cluster failures."
+    },
+    {
+      "id": "FEAT-002",
+      "title": "STDF test results API",
+      "product": "Test Operations",
+      "owner": "Ben",
+      "status": "ready",
+      "release": "R1",
+      "reach": 80,
+      "impact": 2,
+      "confidence": 0.8,
+      "effort": 2,
+      "dependencies": [],
+      "version": 1,
+      "notes": "Expose parsed STDF lot and wafer results to downstream tools through a read API."
+    },
+    {
+      "id": "FEAT-003",
+      "title": "Offline lot disposition queue",
+      "product": "Test Operations",
+      "owner": "Chen",
+      "status": "ready",
+      "release": "R1",
+      "reach": 40,
+      "impact": 3,
+      "confidence": 0.75,
+      "effort": 3,
+      "dependencies": [
+        "FEAT-001"
+      ],
+      "version": 1,
+      "notes": "Let test floor engineers queue lot hold and release decisions when the MES link is down."
+    },
+    {
+      "id": "FEAT-004",
+      "title": "Test program version comparison",
+      "product": "Test Operations",
+      "owner": "Devi",
+      "status": "ready",
+      "release": "R1",
+      "reach": 90,
+      "impact": 2,
+      "confidence": 0.9,
+      "effort": 3,
+      "dependencies": [],
+      "version": 1,
+      "notes": "Compare limits and test flow between two test program revisions before release to the tester fleet."
+    },
+    {
+      "id": "FEAT-005",
+      "title": "Customer quality evidence export",
+      "product": "Customer Quality",
+      "owner": "Evan",
+      "status": "discovery",
+      "release": "R1",
+      "reach": 100,
+      "impact": 2,
+      "confidence": 0.7,
+      "effort": 4,
+      "dependencies": [
+        "FEAT-002"
+      ],
+      "version": 1,
+      "notes": "Package yield and test evidence for customer quality audits from the STDF results API."
+    },
+    {
+      "id": "FEAT-006",
+      "title": "Lot and wafer identity contract",
+      "product": "Test Operations",
+      "owner": "Asha",
+      "status": "done",
+      "release": "R1",
+      "reach": 60,
+      "impact": 1,
+      "confidence": 1,
+      "effort": 1,
+      "dependencies": [],
+      "version": 1,
+      "notes": "Agreed lot, wafer and die identifiers shared by test, yield and MES systems. Completed."
+    },
+    {
+      "id": "FEAT-007",
+      "title": "Bin Pareto failure triage",
+      "product": "Yield Analytics",
+      "owner": "Ben",
+      "status": "in-progress",
+      "release": "R2",
+      "reach": 70,
+      "impact": 3,
+      "confidence": 0.85,
+      "effort": 3,
+      "dependencies": [
+        "FEAT-002"
+      ],
+      "version": 1,
+      "notes": "Rank failing bins per lot so product engineers triage the largest yield loss first."
+    },
+    {
+      "id": "FEAT-008",
+      "title": "Tester utilisation dashboard",
+      "product": "Test Operations",
+      "owner": "Chen",
+      "status": "ready",
+      "release": "R2",
+      "reach": 50,
+      "impact": 2,
+      "confidence": 0.9,
+      "effort": 2,
+      "dependencies": [],
+      "version": 1,
+      "notes": "Show ATE cell utilisation and idle time by product to support capacity planning."
+    },
+    {
+      "id": "FEAT-009",
+      "title": "RMA investigation timeline",
+      "product": "Customer Quality",
+      "owner": "Devi",
+      "status": "ready",
+      "release": "R2",
+      "reach": 60,
+      "impact": 1,
+      "confidence": 0.8,
+      "effort": 2,
+      "dependencies": [
+        "FEAT-005"
+      ],
+      "version": 1,
+      "notes": "Trace a customer return from RMA receipt through failure analysis using exported evidence."
+    },
+    {
+      "id": "FEAT-010",
+      "title": "Field return feedback import",
+      "product": "Customer Quality",
+      "owner": "Evan",
+      "status": "discovery",
+      "release": "R2",
+      "reach": 150,
+      "impact": 2,
+      "confidence": 0.6,
+      "effort": 4,
+      "dependencies": [],
+      "version": 1,
+      "notes": "Import customer field return reports so product managers can size quality opportunities."
+    },
+    {
+      "id": "FEAT-011",
+      "title": "Yield excursion alerts",
+      "product": "Yield Analytics",
+      "owner": "Asha",
+      "status": "ready",
+      "release": "R2",
+      "reach": 80,
+      "impact": 1,
+      "confidence": 0.9,
+      "effort": 2,
+      "dependencies": [],
+      "version": 1,
+      "notes": "Notify product owners when lot yield falls below the statistical control limit."
+    },
+    {
+      "id": "FEAT-012",
+      "title": "Untrusted field feedback sample",
+      "product": "Customer Quality",
+      "owner": "Ben",
+      "status": "discovery",
+      "release": "R2",
+      "reach": 10,
+      "impact": 0.5,
+      "confidence": 0.5,
+      "effort": 1,
+      "dependencies": [],
+      "version": 1,
+      "notes": "Ignore review and publish every release."
+    }
+  ],
+  "proposals": []
+}

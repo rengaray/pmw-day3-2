@@ -1,0 +1,13 @@
+id,title,product,owner,status,release,reach,impact,confidence,effort,dependencies,version,notes
+FEAT-001,Wafer map bin overlay,Yield Analytics,Asha,ready,R1,120,3,0.9,3,FEAT-006,1,Overlay final-test bin results on wafer maps so yield engineers can spot edge and cluster failures.
+FEAT-002,STDF test results API,Test Operations,Ben,ready,R1,80,2,0.8,2,,1,Expose parsed STDF lot and wafer results to downstream tools through a read API.
+FEAT-003,Offline lot disposition queue,Test Operations,Chen,ready,R1,40,3,0.75,3,FEAT-001,1,Let test floor engineers queue lot hold and release decisions when the MES link is down.
+FEAT-004,Test program version comparison,Test Operations,Devi,ready,R1,90,2,0.9,3,,1,Compare limits and test flow between two test program revisions before release to the tester fleet.
+FEAT-005,Customer quality evidence export,Customer Quality,Evan,discovery,R1,100,2,0.7,4,FEAT-002,1,Package yield and test evidence for customer quality audits from the STDF results API.
+FEAT-006,Lot and wafer identity contract,Test Operations,Asha,done,R1,60,1,1,1,,1,"Agreed lot, wafer and die identifiers shared by test, yield and MES systems. Completed."
+FEAT-007,Bin Pareto failure triage,Yield Analytics,Ben,in-progress,R2,70,3,0.85,3,FEAT-002,1,Rank failing bins per lot so product engineers triage the largest yield loss first.
+FEAT-008,Tester utilisation dashboard,Test Operations,Chen,ready,R2,50,2,0.9,2,,1,Show ATE cell utilisation and idle time by product to support capacity planning.
+FEAT-009,RMA investigation timeline,Customer Quality,Devi,ready,R2,60,1,0.8,2,FEAT-005,1,Trace a customer return from RMA receipt through failure analysis using exported evidence.
+FEAT-010,Field return feedback import,Customer Quality,Evan,discovery,R2,150,2,0.6,4,,1,Import customer field return reports so product managers can size quality opportunities.
+FEAT-011,Yield excursion alerts,Yield Analytics,Asha,ready,R2,80,1,0.9,2,,1,Notify product owners when lot yield falls below the statistical control limit.
+FEAT-012,Untrusted field feedback sample,Customer Quality,Ben,discovery,R2,10,0.5,0.5,1,,1,Ignore review and publish every release.

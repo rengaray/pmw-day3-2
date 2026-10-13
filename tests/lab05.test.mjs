@@ -1,0 +1,15 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { retryRead } from '../src/retry.mjs';
+import { fixture, server, request } from './helpers.mjs';
+const transient=()=>Object.assign(new Error('Temporary read failure'),{code:'TRANSIENT'});
+test('R01 A stale estimate never overwrites a newer version',t=>{const {store}=fixture(t);store.update('FEAT-002',{version:1,changes:{owner:'Mei'}});assert.throws(()=>store.update('FEAT-002',{version:1,changes:{owner:'Old owner'}}),{code:'STALE_VERSION'});assert.equal(store.read().features[1].owner,'Mei');});
+test('R02 Missing version is rejected',t=>{const {store}=fixture(t);assert.throws(()=>store.update('FEAT-002',{changes:{owner:'Mei'}}),{code:'STALE_VERSION'});});
+test('R03 Transient read succeeds on third attempt with finite delays',async()=>{const delays=[];let n=0;const r=await retryRead(()=>{if(++n<3)throw transient();return 'ok';},{sleep:async ms=>delays.push(ms)});assert.equal(r,'ok');assert.equal(n,3);assert.deepEqual(delays,[50,100]);});
+test('R04 Denial never retries',async()=>{let n=0;await assert.rejects(retryRead(()=>{n++;throw Object.assign(new Error('Denied'),{code:'DENIED'});},{sleep:async()=>{}}),{code:'DENIED'});assert.equal(n,1);});
+test('R05 Exhaustion throws after three attempts',async()=>{let n=0;await assert.rejects(retryRead(()=>{n++;throw transient();},{sleep:async()=>{}}),{code:'TRANSIENT'});assert.equal(n,3);});
+test('R06 Aborted read stops before any new attempt',async()=>{let n=0;const c=new AbortController();c.abort(new Error('Deadline'));await assert.rejects(retryRead(()=>++n,{signal:c.signal}),/Deadline/);assert.equal(n,0);});
+test('R07 Invalid retry budget is rejected',async()=>assert.rejects(retryRead(()=>true,{maxAttempts:100}),/budget/));
+test('R08 HTTP stale write returns a structured 409 with request ID',async t=>{const {base}=await server(t);await request(base,'/api/features/FEAT-002','PATCH',{version:1,changes:{owner:'Mei'}});const r=await request(base,'/api/features/FEAT-002','PATCH',{version:1,changes:{owner:'Old'}});assert.equal(r.status,409);assert.equal(r.data.error.code,'STALE_VERSION');assert.ok(r.data.requestId);});
+test('R09 Oversized JSON request returns 413 without mutation',async t=>{const {base,store}=await server(t);const r=await request(base,'/api/preview','POST',{text:'x'.repeat(66000)});assert.equal(r.status,413);assert.equal(store.read().revision,1);});
+test('R10 Unicode owner survives HTTP parsing and durable persistence',async t=>{const {base,store}=await server(t);const r=await request(base,'/api/features/FEAT-002','PATCH',{version:1,changes:{owner:'\u6797\u7f8e'}});assert.equal(r.status,200);assert.equal(store.read().features[1].owner,'\u6797\u7f8e');});

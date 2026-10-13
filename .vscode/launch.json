@@ -1,0 +1,14 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug Product Workbench",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/src/server.mjs",
+      "cwd": "${workspaceFolder}",
+      "env": { "PMW_LOG": "json" },
+      "skipFiles": ["<node_internals>/**"]
+    }
+  ]
+}

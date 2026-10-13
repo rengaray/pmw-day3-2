@@ -1,0 +1,73 @@
+name: ci
+on:
+  pull_request:
+    # edited: re-run the guard when you tick a role pass in the description.
+    types: [opened, synchronize, reopened, edited]
+  push:
+    branches: [main]
+  workflow_dispatch:
+# Least privilege: CI only reads the repository.
+permissions:
+  contents: read
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  accepted-checks:
+    name: accepted-checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      # Workshop uses major-version tags. In production pin each action to a full commit SHA and let Dependabot update it.
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+      - run: npm run preflight
+      - name: Accepted acceptance suites
+        run: npm run ci:accepted
+  performance-budget:
+    name: performance-budget
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+      - name: Domain hot-path budget
+        run: |
+          node scripts/perf.mjs --json > perf-report.json || status=$?
+          node -e "const r=require('./perf-report.json');for(const x of r.results)console.log((x.pass?'PASS':'FAIL'),x.name,'p95',x.p95Ms,'ms budget',x.budgetMs,'ms')" >> "$GITHUB_STEP_SUMMARY"
+          exit ${status:-0}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: perf-report
+          path: perf-report.json
+          retention-days: 7
+  governance-guard:
+    name: governance-guard
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+      - name: Guard self-tests
+        run: npm run guard:test
+      - name: Governance guard
+        # The description is passed as data through the environment, never interpolated into the script.
+        # The base branch's copy of the guard judges the pull request, so a pull request cannot weaken the
+        # guard that checks it. This workflow file itself still comes from the pull request: review gate files
+        # line by line.
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          git show "$BASE_SHA:scripts/guard.mjs" > "$RUNNER_TEMP/guard.mjs"
+          node "$RUNNER_TEMP/guard.mjs"

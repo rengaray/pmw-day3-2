@@ -1,0 +1,10 @@
+{
+  "description": "Performance budgets for the domain hot paths on a synthetic semiconductor backlog. Times are milliseconds on a CI-class runner. Change a budget only through a reviewed pull request that records the reason.",
+  "backlogSize": 999,
+  "runs": 40,
+  "warmupRuns": 5,
+  "budgets": {
+    "queryFeatures.priority": { "p95Ms": 15 },
+    "previewRelease.12": { "p95Ms": 15 }
+  }
+}

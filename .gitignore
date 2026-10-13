@@ -1,0 +1,6 @@
+runtime/
+evidence/candidate.json
+perf-report.json
+node_modules/
+.env
+*.log

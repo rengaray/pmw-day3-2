@@ -1,0 +1,34 @@
+{
+  "workItem": "",
+  "contractVersion": "",
+  "branch": "",
+  "candidateSha": "",
+  "pullRequest": "",
+  "requiredChecks": [],
+  "dirtyChanges": [],
+  "agentRoute": "",
+  "usage": {
+    "billingUnit": "ai-credits or premium-requests",
+    "observedUsage": null,
+    "acceptedWorkItems": null,
+    "observedUsagePerAcceptedItem": null,
+    "promptsPerAcceptedItem": null,
+    "toolResultTokensEstimated": null,
+    "report": "evidence/usage-report.md"
+  },
+  "performance": {
+    "perfBudgetResult": "",
+    "httpP95ByRoute": {}
+  },
+  "completed": [],
+  "pending": [],
+  "decisions": [],
+  "checks": [],
+  "browserEvidence": [],
+  "reviewFindings": [],
+  "nextAction": "",
+  "humanAcceptance": {
+    "owner": "",
+    "decision": "pending"
+  }
+}

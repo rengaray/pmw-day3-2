@@ -1,0 +1,3 @@
+Select pm-planner first, then pm-implementer only after the human approves the revised plan.
+
+Implement CR01. Selected features require confidence at least 0.80. Return LOW_CONFIDENCE for lower values. Exactly 0.80 remains eligible. Advance the workshop contract and exported version to 1.1, keep all previous rules and use the new capstone acceptance file. Add tests/capstone.test.mjs to ci/accepted-suites.json in the same pull request. Show the blocker in the existing Web UI and prove that bypassing the disabled button cannot draft a blocked release. Run the complete suite and npm run perf, inspect MCP contract context and its usage telemetry, obtain a fresh review on the pull request and record workplace transfer decisions.

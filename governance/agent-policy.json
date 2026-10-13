@@ -1,0 +1,10 @@
+{
+  "description": "Least-privilege tool policy per agent role, enforced by scripts/guard.mjs on every pull request. The guard reads this file from the base branch, so a change to it must be merged in its own pull request with a Policy change reason before a profile can use it. A trailing /* allows every tool from one MCP server.",
+  "profiles": {
+    "pm-planner": { "tools": ["read", "search", "productWorkbench/*"] },
+    "pm-implementer": { "tools": ["read", "search", "edit", "execute"] },
+    "pm-tool-engineer": { "tools": ["read", "search", "edit", "execute"] },
+    "pm-reviewer": { "tools": ["read", "search"] },
+    "pm-coordinator": { "tools": ["read", "search", "agent"], "agents": ["pm-planner", "pm-reviewer"] }
+  }
+}

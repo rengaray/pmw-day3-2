@@ -1,0 +1,12 @@
+{
+  "servers": {
+    "productWorkbench": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["${workspaceFolder}/mcp/server.mjs"],
+      "env": {
+        "PMW_TOKEN_BUDGET": "1500"
+      }
+    }
+  }
+}

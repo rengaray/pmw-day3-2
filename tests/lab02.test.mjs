@@ -1,0 +1,18 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { spawn } from 'node:child_process';
+import { once } from 'node:events';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { seed } from './helpers.mjs';
+import { tools, callTool } from '../mcp/tools.mjs';
+import { CONTRACT_VERSION } from '../src/domain.mjs';
+test('M01 Four bounded read tools, no publish or shell tool',()=>{assert.deepEqual(tools.map(t=>t.name),['list_features','get_feature','get_release_context','get_contract']);});
+test('M02 Exact feature lookup retains identity and revision',()=>{assert.equal(callTool(seed,'get_feature',{id:'FEAT-002'}).feature.id,'FEAT-002');});
+test('M03 Traversal argument is invalid',()=>{assert.throws(()=>callTool(seed,'get_feature',{id:'../secret'}),{code:'INVALID_INPUT'});});
+test('M04 Release context contains only six R1 features',()=>{const r=callTool(seed,'get_release_context',{release:'R1'});assert.equal(r.features.length,6);assert.ok(r.features.every(f=>f.release==='R1'));assert.equal(r.revision,1);assert.equal(r.contractVersion,CONTRACT_VERSION);assert.equal(r.advisory,true);});
+test('M05 Unknown release is rejected',()=>{assert.throws(()=>callTool(seed,'get_release_context',{release:'R9'}),{code:'INVALID_INPUT'});});
+test('M06 Unknown tool and extra arguments fail closed',()=>{assert.throws(()=>callTool(seed,'publish_release',{}),{code:'UNKNOWN_TOOL'});assert.throws(()=>callTool(seed,'get_feature',{id:'FEAT-002',path:'/etc/passwd'}),{code:'INVALID_INPUT'});});
+test('M07 Tool call leaves data unchanged',()=>{const before=JSON.stringify(seed);callTool(seed,'get_feature',{id:'FEAT-012'});assert.equal(JSON.stringify(seed),before);});
+test('M08 Stdio speaks initialization, discovery and tool results',async t=>{const dir=fs.mkdtempSync(path.join(os.tmpdir(),'pmw-m08-'));t.after(()=>fs.rmSync(dir,{recursive:true,force:true}));const child=spawn(process.execPath,['mcp/server.mjs'],{cwd:new URL('..',import.meta.url),env:{...process.env,PMW_TELEMETRY_DIR:dir},stdio:['pipe','pipe','pipe']});let out='',err='';child.stdout.on('data',b=>out+=b);child.stderr.on('data',b=>err+=b);const done=once(child,'close');for(const r of [{id:1,method:'initialize',params:{protocolVersion:'2025-11-25',capabilities:{},clientInfo:{name:'workshop-probe',version:'1'}}},{method:'notifications/initialized'},{id:2,method:'tools/list'},{id:3,method:'tools/call',params:{name:'get_feature',arguments:{id:'FEAT-002'}}},{id:4,method:'tools/call',params:{name:'publish_release',arguments:{}}}]) child.stdin.write(JSON.stringify({jsonrpc:'2.0',...r})+'\n');child.stdin.end();const [code]=await done;assert.equal(code,0,err);const rows=out.trim().split('\n').map(JSON.parse);assert.equal(rows.length,4);assert.equal(rows[0].result.protocolVersion,'2025-11-25');assert.equal(rows[1].result.tools.length,4);assert.equal(JSON.parse(rows[2].result.content[0].text).feature.id,'FEAT-002');assert.equal(rows[3].result.isError,true);});

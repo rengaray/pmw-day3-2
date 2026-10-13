@@ -1,0 +1,20 @@
+# TEAM TRANSFER ONLY. The solo edition does not use this file: GitHub does not let a pull request's
+# author approve it, so required code-owner review would block a one-person repository.
+# When the repository gains a second maintainer, copy this to .github/CODEOWNERS, replace each
+# placeholder with a real login, and turn on code-owner review and one required approval in the ruleset.
+
+*                               @DRIVER-LOGIN @EVIDENCE-LOGIN @REVIEWER-LOGIN
+
+# Agent behaviour is code. Profiles, instructions and MCP configuration change how every agent acts.
+/.github/agents/                @REVIEWER-LOGIN @EVIDENCE-LOGIN
+/.github/copilot-instructions.md @REVIEWER-LOGIN @EVIDENCE-LOGIN
+/.github/instructions/          @REVIEWER-LOGIN @EVIDENCE-LOGIN
+/.vscode/mcp.json               @REVIEWER-LOGIN @EVIDENCE-LOGIN
+/mcp/                           @REVIEWER-LOGIN @EVIDENCE-LOGIN
+
+# Quality gates. Changes here can silently weaken acceptance.
+/.github/workflows/             @REVIEWER-LOGIN
+/ci/                            @REVIEWER-LOGIN
+/tests/                         @REVIEWER-LOGIN
+/perf-budget.json               @REVIEWER-LOGIN
+/.github/CODEOWNERS             @REVIEWER-LOGIN

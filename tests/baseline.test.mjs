@@ -1,0 +1,13 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import { fixture, server, seed, request } from './helpers.mjs';
+import { validateFeature } from '../src/domain.mjs';
+test('B01 Seed has twelve unique feature records',()=>{assert.equal(seed.features.length,12);assert.equal(new Set(seed.features.map(f=>f.id)).size,12);});
+test('B02 Seed satisfies field validation',()=>{for(const f of seed.features)validateFeature(f);});
+test('B03 HTTP serves a health record and UI assets',async t=>{const {base}=await server(t);assert.equal((await request(base,'/api/health')).status,200);for(const route of ['/','/app.mjs','/release-view.mjs','/style.css'])assert.equal((await fetch(base+route)).status,200);});
+test('B04 HTTP backlog includes all seed IDs',async t=>{const {base}=await server(t);const r=await request(base,'/api/features?sort=id');assert.equal(r.data.items.length,12);assert.equal(r.data.items[0].id,'FEAT-001');});
+test('B05 Valid estimate persists across store reopen',t=>{const {file,store}=fixture(t);store.update('FEAT-002',{version:1,changes:{owner:'Mei'}});assert.equal(JSON.parse(fs.readFileSync(file,'utf8')).features.find(f=>f.id==='FEAT-002').owner,'Mei');});
+test('B06 Invalid effort never mutates state',t=>{const {store}=fixture(t);assert.throws(()=>store.update('FEAT-002',{version:1,changes:{effort:0}}),{code:'INVALID_INPUT'});assert.equal(store.read().revision,1);});
+test('B07 Unknown route and file access return 404',async t=>{const {base}=await server(t);for(const r of ['/data/seed.json','/src/server.mjs','/missing'])assert.equal((await fetch(base+r)).status,404);});
+test('B08 Malformed JSON and cross-origin requests are rejected',async t=>{const {base}=await server(t);const r=await fetch(base+'/api/preview',{method:'POST',headers:{'Content-Type':'application/json'},body:'{bad'});assert.equal(r.status,400);assert.equal((await fetch(base+'/api/features',{headers:{Origin:'https://external.invalid'}})).status,403);});

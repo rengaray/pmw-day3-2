@@ -1,0 +1,16 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import { createStore } from '../src/store.mjs';
+import { previewRelease } from '../src/domain.mjs';
+import { releaseView } from '../web/release-view.mjs';
+import { fixture, server, seed, valid, request } from './helpers.mjs';
+test('W01 Pending view never enables drafting',()=>assert.equal(releaseView(null,{pending:true}).canDraft,false));
+test('W02 Eligible preview provides a usable UI state',()=>{const p=previewRelease(seed,valid);assert.equal(releaseView(p).headline,'Ready to draft');assert.equal(releaseView(p).canDraft,true);});
+test('W03 Blockers are exposed as explanatory UI lines',()=>{const p=previewRelease(seed,{...valid,capacity:7});const v=releaseView(p);assert.equal(v.headline,'Release blocked');assert.ok(v.lines.some(x=>x.startsWith('CAPACITY:')));});
+test('W04 Server rejects an edited snapshot token',t=>{const {store}=fixture(t);const p=previewRelease(store.read(),valid);assert.throws(()=>store.draft({preview:{...p,snapshotHash:'fake'},idempotencyKey:'session_1234'}),{code:'STALE_PREVIEW'});});
+test('W05 Changed data makes an earlier preview stale',t=>{const {store}=fixture(t);const p=previewRelease(store.read(),valid);store.update('FEAT-002',{version:1,changes:{effort:2.5}});assert.throws(()=>store.draft({preview:p,idempotencyKey:'session_1234'}),{code:'STALE_PREVIEW'});});
+test('W06 A matching blocked preview cannot create a draft',t=>{const {store}=fixture(t);const p=previewRelease(store.read(),{...valid,capacity:7});assert.throws(()=>store.draft({preview:p,idempotencyKey:'session_1234'}),{code:'BLOCKED_RELEASE'});assert.equal(store.read().proposals.length,0);});
+test('W07 Idempotency replay survives store reopen',t=>{const {file,store}=fixture(t);const p=previewRelease(store.read(),valid);const body={preview:p,idempotencyKey:'session_1234'};const first=store.draft(body);const again=createStore(file,seed).draft(body);assert.equal(first.proposal.id,'DRAFT-001');assert.equal(again.replayed,true);assert.equal(JSON.parse(fs.readFileSync(file)).proposals.length,1);});
+test('W08 Reusing a key for another body is a conflict',t=>{const {store}=fixture(t);const p=previewRelease(store.read(),valid);store.draft({preview:p,idempotencyKey:'session_1234'});assert.throws(()=>store.draft({preview:{...p,capacity:9},idempotencyKey:'session_1234'}),{code:'KEY_REUSE'});});
+test('W09 HTTP creates one draft and returns 200 on replay',async t=>{const {base}=await server(t);const p=(await request(base,'/api/preview','POST',valid)).data;const body={preview:p,idempotencyKey:'session_1234'};assert.equal((await request(base,'/api/proposals','POST',body)).status,201);assert.equal((await request(base,'/api/proposals','POST',body)).status,200);assert.equal((await request(base,'/api/proposals')).data.items.length,1);});
