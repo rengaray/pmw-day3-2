@@ -1,11 +1,11 @@
 # Readiness record
 
-Engineer and date:
-Node and VS Code versions:
-Git branch and actual SHA:
-GitHub repository URL, where it lives (organisation or personal, public or private) and your role (must be Admin):
-Ruleset applied (API or UI route), bypass list (must be empty) and the three required checks listed:
-Direct push rejected (paste the rejection line):
+Engineer and date: Renga 13102026
+Node and VS Code versions:24.19.0 1.141.0
+Git branch and actual SHA:lab1/agents-governance
+GitHub repository URL, where it lives (organisation or personal, public or private) and your role (must be Admin): public
+Ruleset applied (API or UI route), bypass list (must be empty) and the three required checks listed:yes
+Direct push rejected (paste the rejection line):yes
 Copilot plan, organisation policy and billing model (GitHub AI Credits, or legacy premium requests on an annual Pro or Pro+ plan):
 Copilot usage at start of day (credits or percentage of budget, and where you read it):
 Models available in the picker and their price per million input and output tokens (GitHub models and pricing page):
